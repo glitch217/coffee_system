@@ -1,5 +1,5 @@
 {
-  "name": "coffee-system-generator-function",
+  "name": "coffee-system-generator",
   "version": "1.0.0",
   "dependencies": {
     "@notionhq/client": "^2.2.14"
