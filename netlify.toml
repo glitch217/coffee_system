@@ -2,9 +2,6 @@
   publish = "."
   functions = "netlify/functions"
 
-[functions]
-  node_bundle = true
-
 [[redirects]]
   from = "/*"
   to = "/index.html"
