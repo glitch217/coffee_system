@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coffee System Generator</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1><i class="fas fa-mug-hot"></i> Coffee System Generator</h1>
+            <p class="subtitle">Design your personalized morning ritual in 2 minutes</p>
+        </header>
+
+        <!-- Progress Bar -->
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+            <div class="progress-steps">
+                <span class="step active">1</span>
+                <span class="step">2</span>
+                <span class="step">3</span>
+                <span class="step">4</span>
+                <span class="step">5</span>
+            </div>
+        </div>
+
+        <!-- Question Container -->
+        <div class="question-container" id="questionContainer">
+            <!-- Questions will be injected here by JavaScript -->
+        </div>
+
+        <!-- Navigation Buttons -->
+        <div class="navigation">
+            <button class="btn btn-secondary" id="prevBtn" disabled>
+                <i class="fas fa-arrow-left"></i> Back
+            </button>
+            <button class="btn btn-primary" id="nextBtn">
+                Next <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+
+        <!-- Preview (hidden initially) -->
+        <div class="preview-container" id="previewContainer" style="display: none;">
+            <h2><i class="fas fa-eye"></i> Your System Preview</h2>
+            <div class="preview-card" id="previewContent">
+                <!-- Preview will be filled by JavaScript -->
+            </div>
+            <div class="actions">
+                <button class="btn btn-secondary" id="editBtn">
+                    <i class="fas fa-edit"></i> Edit Answers
+                </button>
+                <button class="btn btn-success" id="generateBtn">
+                    <i class="fas fa-magic"></i> Generate My System ($19)
+                </button>
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div class="loading" id="loading" style="display: none;">
+            <div class="spinner"></div>
+            <p>Creating your personalized system in Notion...</p>
+        </div>
+
+        <!-- Result (hidden initially) -->
+        <div class="result-container" id="resultContainer" style="display: none;">
+            <div class="success-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h2
