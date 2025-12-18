@@ -12,31 +12,53 @@
     
     <!-- Styles -->
     <link rel="stylesheet" href="style.css">
+    
+    <!-- Force accent color inline -->
     <style>
-  /* Debug: Force accent color */
-  .debug-accent {
-    color: #7851a9 !important;
-    border-color: #7851a9 !important;
-    background-color: #7851a9 !important;
-  }
-  
-  /* Quick test selector */
-  .mode-button.selected {
-    border-color: #7851a9 !important;
-    color: #7851a9 !important;
-  }
-  
-  .btn-primary {
-    background-color: #7851a9 !important;
-  }
-</style>
+        /* FORCE ACCENT COLOR - TEMPORARY FIX */
+        :root {
+            --accent: #7851a9 !important;
+            --accent-dark: #5d3d87 !important;
+        }
+        
+        .mode-button.selected {
+            border-color: #7851a9 !important;
+            color: #7851a9 !important;
+            background-color: rgba(120, 81, 169, 0.03) !important;
+        }
+        
+        .mode-button.selected::after {
+            color: #7851a9 !important;
+        }
+        
+        .btn-primary {
+            background-color: #7851a9 !important;
+            color: white !important;
+        }
+        
+        .btn-primary:hover:not(:disabled) {
+            background-color: #5d3d87 !important;
+        }
+        
+        .concept-label {
+            color: #7851a9 !important;
+        }
+        
+        .protocol-item::before {
+            color: #7851a9 !important;
+        }
+        
+        .card-progress {
+            color: #7851a9 !important;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
         <!-- Header -->
         <header class="protocol-header">
             <h1 class="protocol-title">COFFEE SYSTEM GENERATOR</h1>
-            <p class="protocol-meta">A DreamCo artifact • v1.0</p>
+            <p class="protocol-meta">A systems literacy artifact • v1.0</p>
         </header>
 
         <!-- Mode Selection -->
