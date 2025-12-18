@@ -14,44 +14,17 @@
     <link rel="stylesheet" href="style.css">
     
     <!-- Force accent color inline -->
-    <style>
-        /* FORCE ACCENT COLOR - TEMPORARY FIX */
-        :root {
-            --accent: #7851a9 !important;
-            --accent-dark: #5d3d87 !important;
-        }
-        
-        .mode-button.selected {
-            border-color: #7851a9 !important;
-            color: #7851a9 !important;
-            background-color: rgba(120, 81, 169, 0.03) !important;
-        }
-        
-        .mode-button.selected::after {
-            color: #7851a9 !important;
-        }
-        
-        .btn-primary {
-            background-color: #7851a9 !important;
-            color: white !important;
-        }
-        
-        .btn-primary:hover:not(:disabled) {
-            background-color: #5d3d87 !important;
-        }
-        
-        .concept-label {
-            color: #7851a9 !important;
-        }
-        
-        .protocol-item::before {
-            color: #7851a9 !important;
-        }
-        
-        .card-progress {
-            color: #7851a9 !important;
-        }
-    </style>
+<style>
+  /* Test element - should show #7851a9 */
+  .test-accent {
+    color: #7851a9;
+    padding: 1rem;
+    border: 2px solid #7851a9;
+    margin: 1rem 0;
+  }
+</style>
+<div class="test-accent">If this shows purple, CSS works. If not, CSS broken.</div>
+<script src="script.js"></script>
 </head>
 <body>
     <div class="container">
