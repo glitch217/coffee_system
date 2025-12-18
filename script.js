@@ -1,419 +1,483 @@
-// Questions data
-const questions = [
-  {
-    id: 1,
-    question: "What's your #1 coffee goal right now?",
-    icon: "fas fa-bullseye",
-    options: [
-      {
-        id: "agency",
-        title: "Agency",
-        description: "I want to feel in control of my morning",
-        icon: "fas fa-chess-king"
-      },
-      {
-        id: "grounding",
-        title: "Grounding",
-        description: "I need a calm anchor to start the day",
-        icon: "fas fa-mountain"
-      },
-      {
-        id: "craft",
-        title: "Craft",
-        description: "I enjoy perfecting the process itself",
-        icon: "fas fa-tools"
-      },
-      {
-        id: "alertness",
-        title: "Alertness",
-        description: "Fast, effective wake-up energy",
-        icon: "fas fa-bolt"
-      },
-      {
-        id: "steady-energy",
-        title: "Steady Energy",
-        description: "Sustained focus without jitters",
-        icon: "fas fa-chart-line"
-      },
-      {
-        id: "appetite-control",
-        title: "Appetite Control",
-        description: "Help manage hunger",
-        icon: "fas fa-apple-alt"
-      }
-    ]
-  },
-  {
-    id: 2,
-    question: "What's your absolute max prep time?",
-    icon: "fas fa-clock",
-    options: [
-      {
-        id: "2",
-        title: "2 minutes",
-        description: "Bare minimum - I'm in a rush",
-        icon: "fas fa-running"
-      },
-      {
-        id: "5",
-        title: "5 minutes",
-        description: "Reasonable - I can take a moment",
-        icon: "fas fa-walking"
-      },
-      {
-        id: "8",
-        title: "8 minutes",
-        description: "I can indulge in the process",
-        icon: "fas fa-couch"
-      }
-    ]
-  },
-  {
-    id: 3,
-    question: "Which constraint matters most?",
-    icon: "fas fa-balance-scale",
-    options: [
-      {
-        id: "time",
-        title: "Time",
-        description: "Speed is everything",
-        icon: "fas fa-stopwatch"
-      },
-      {
-        id: "consistency",
-        title: "Consistency",
-        description: "Same results every time",
-        icon: "fas fa-redo"
-      },
-      {
-        id: "cost",
-        title: "Cost",
-        description: "Budget-friendly above all",
-        icon: "fas fa-coins"
-      }
-    ]
-  },
-  {
-    id: 4,
-    question: "How important is your mug/cup?",
-    icon: "fas fa-mug-hot",
-    options: [
-      {
-        id: "low",
-        title: "Low",
-        description: "Just a container - function over form",
-        icon: "fas fa-box"
-      },
-      {
-        id: "medium",
-        title: "Medium",
-        description: "Nice to have - adds to the experience",
-        icon: "fas fa-wine-glass-alt"
-      },
-      {
-        id: "high",
-        title: "High",
-        description: "Essential - the vessel defines the ritual",
-        icon: "fas fa-gem"
-      }
-    ]
-  },
-  {
-    id: 5,
-    question: "When would you adjust your system?",
-    icon: "fas fa-cogs",
-    options: [
-      {
-        id: "chore",
-        title: "When it feels like a chore",
-        description: "Adjust when the joy fades",
-        icon: "fas fa-tired"
-      },
-      {
-        id: "scattered",
-        title: "When mornings feel scattered",
-        description: "Adjust when it stops working",
-        icon: "fas fa-wind"
-      },
-      {
-        id: "seasonal",
-        title: "Every 3 months automatically",
-        description: "Seasonal review and refresh",
-        icon: "fas fa-calendar-alt"
-      }
-    ]
-  }
-];
+// ============================================
+// COFFEE SYSTEM GENERATOR - TWO-PATH LOGIC
+// Design: SSENSE × GitLab, Systems literacy focus
+// ============================================
 
-// State management
-let currentQuestion = 0;
-let answers = {};
-let systemCount = localStorage.getItem('systemCount') || 0;
+// ============================================
+// STATE MANAGEMENT
+// ============================================
+let currentMode = null; // 'utility' or 'ritual'
+let currentQuestionIndex = 0;
+let userAnswers = {};
+let systemId = localStorage.getItem('systemCount') || 0;
 
-// DOM Elements
+// ============================================
+// DOM ELEMENTS
+// ============================================
+const modeSelector = document.getElementById('modeSelector');
+const utilityBtn = document.getElementById('utilityBtn');
+const ritualBtn = document.getElementById('ritualBtn');
 const questionContainer = document.getElementById('questionContainer');
-const progressBar = document.getElementById('progressBar');
+const navigation = document.getElementById('navigation');
 const prevBtn = document.getElementById('prevBtn');
 const nextBtn = document.getElementById('nextBtn');
-const previewContainer = document.getElementById('previewContainer');
-const previewContent = document.getElementById('previewContent');
-const editBtn = document.getElementById('editBtn');
-const generateBtn = document.getElementById('generateBtn');
-const loading = document.getElementById('loading');
-const resultContainer = document.getElementById('resultContainer');
-const notionLink = document.getElementById('notionLink');
+const progressIndicator = document.getElementById('progressIndicator');
+const protocolPreview = document.getElementById('protocolPreview');
+const editProtocolBtn = document.getElementById('editProtocolBtn');
+const generateProtocolBtn = document.getElementById('generateProtocolBtn');
+const loadingState = document.getElementById('loadingState');
+const successState = document.getElementById('successState');
 const newSystemBtn = document.getElementById('newSystemBtn');
+const openNotionBtn = document.getElementById('openNotionBtn');
+const notionUrl = document.getElementById('notionUrl');
 
-// Initialize
-displayQuestion(currentQuestion);
-updateProgressBar();
-updateNavigation();
+// Protocol display elements
+const protocolTitle = document.getElementById('protocolTitle');
+const protocolMeta = document.getElementById('protocolMeta');
+const protocolObjective = document.getElementById('protocolObjective');
+const protocolConfig = document.getElementById('protocolConfig');
+const protocolSequence = document.getElementById('protocolSequence');
+const protocolFailure = document.getElementById('protocolFailure');
+const protocolRepeat = document.getElementById('protocolRepeat');
 
-// Event Listeners
+// ============================================
+// QUESTION DATA
+// ============================================
+
+const utilityQuestions = [
+    {
+        parameter: "Primary Function",
+        description: "If coffee had one job to do for you, what would it be?",
+        systemsConcept: "This defines the CORE UTILITY FUNCTION of your system. Every downstream parameter—from bean type to dosage—is determined from this point.",
+        options: [
+            { id: "alertness", title: "Shock Awake", description: "To shock my nervous system awake and achieve alertness as fast as possible." },
+            { id: "thinking", title: "Improve Thinking", description: "To improve thinking and focus once I'm already awake." },
+            { id: "steady-energy", title: "Steady Energy", description: "To provide steady energy without common side effects like jitters or anxiety." },
+            { id: "appetite", title: "Appetite Control", description: "To suppress my appetite." }
+        ]
+    },
+    {
+        parameter: "Key Constraint",
+        description: "If you could optimize for only one practical priority, which would it be?",
+        systemsConcept: "This identifies the NON-NEGOTIABLE CONSTRAINT—the primary bottleneck around which your entire system must be designed.",
+        options: [
+            { id: "time", title: "Time (Speed)", description: "Speed is everything." },
+            { id: "consistency", title: "Consistency (Reliability)", description: "Same results every time." },
+            { id: "cost", title: "Cost (Efficiency)", description: "Budget-friendly above all." }
+        ]
+    },
+    {
+        parameter: "Time Budget",
+        description: "What is the maximum amount of hands-on time you are willing to invest per session?",
+        systemsConcept: "This sets a HARD OPERATIONAL BOUNDARY, forcing trade-offs between complexity, quality, and resource expenditure.",
+        options: [
+            { id: "2", title: "2 minutes", description: "Bare minimum - I'm in a rush." },
+            { id: "5", title: "5 minutes", description: "Reasonable - I can take a moment." },
+            { id: "8", title: "8 minutes", description: "I can indulge in the process." }
+        ]
+    },
+    {
+        parameter: "Cost Parameter",
+        description: "What is your acceptable cost per cup?",
+        systemsConcept: "This quantifies the INPUT RESOURCE BUDGET, directly linking financial investment to the quality and sourcing of system inputs.",
+        options: [
+            { id: "under-50", title: "Under $0.50", description: "Minimal cost per serving." },
+            { id: "50-100", title: "$0.50–$1.00", description: "Moderate investment." },
+            { id: "100-200", title: "$1.00–$2.00", description: "Premium quality acceptable." }
+        ]
+    },
+    {
+        parameter: "Operating Environment",
+        description: "Where must this coffee system reliably function?",
+        systemsConcept: "This determines the CONTEXTUAL ENVELOPE—the external conditions (stability, space, tools) your system must be robust enough to withstand.",
+        options: [
+            { id: "home", title: "Home", description: "Quiet, controlled space." },
+            { id: "office", title: "Office", description: "Shared, busy environment." },
+            { id: "travel", title: "Travel", description: "On the go, portable setup." }
+        ]
+    }
+];
+
+const ritualQuestions = [
+    {
+        parameter: "Core Purpose",
+        description: "What is the primary directive of your ritual?",
+        systemsConcept: "This defines your system's PURPOSE. It is the primary feedback loop you are optimizing for and the ultimate metric of success.",
+        options: [
+            { id: "agency", title: "Agency", description: "The feeling of being the cause, not just the effect." },
+            { id: "grounding", title: "Grounding", description: "A sensory pull that centers you, from the scent of the beans to the sound of a heavy pour." },
+            { id: "craft", title: "Craft / Personalization", description: "A signature touch that makes the experience distinctly yours." },
+            { id: "warmth", title: "Warmth / Connection", description: "A sense of spaciousness or connection to natural elements." }
+        ]
+    },
+    {
+        parameter: "Temporal Resolution",
+        description: "Would you like your ritual to reflect changes in the seasons or calendar?",
+        systemsConcept: "This determines your system's ADAPTATION FREQUENCY. A 'Yes' integrates external time as a key input, creating a responsive and evolving ritual.",
+        options: [
+            { id: "no", title: "No", description: "Static system - no seasonal changes." },
+            { id: "weekly", title: "Yes, weekly", description: "High-frequency adaptation." },
+            { id: "monthly", title: "Yes, monthly", description: "Medium-frequency calibration." },
+            { id: "seasonal", title: "Yes, seasonally", description: "Low-frequency, macro-adaptation." }
+        ]
+    },
+    {
+        parameter: "Enabling Constraint",
+        description: "How critical is the mug or tumbler to the experience?",
+        systemsConcept: "This defines a KEY INTERFACE COMPONENT. Its importance dictates whether it is merely a container or a core variable shaping the entire outcome.",
+        options: [
+            { id: "low", title: "Low", description: "Just a container - function over form." },
+            { id: "medium", title: "Medium", description: "Nice to have - adds to the experience." },
+            { id: "high", title: "High", description: "Essential - the vessel defines the ritual." }
+        ]
+    },
+    {
+        parameter: "Maintenance Protocol",
+        description: "How will you know your ritual needs adjusting?",
+        systemsConcept: "This establishes your SYSTEM MONITORING RULE. It specifies the trigger—whether an internal signal or a calendar event—for iterative maintenance.",
+        options: [
+            { id: "chore", title: "Feels like a chore", description: "Adjust when the joy fades." },
+            { id: "scattered", title: "Mornings feel scattered", description: "Adjust when it stops working." },
+            { id: "seasonal-review", title: "Seasonal review", description: "Review and recalibrate every 3 months." }
+        ]
+    },
+    {
+        parameter: "Feedback Mechanism",
+        description: "How will you measure your ritual's success?",
+        systemsConcept: "This defines your MEASUREMENT AND FEEDBACK LOOP. A system without measurement cannot be improved.",
+        options: [
+            { id: "daily-check", title: "Daily check-in", description: "A quick 1-5 rating in my journal." },
+            { id: "weekly-review", title: "Weekly review", description: "Sundays: Did my mornings feel better this week?" },
+            { id: "outcome-tracking", title: "Outcome tracking", description: "Track energy levels, mood, or productivity metrics." },
+            { id: "intuitive", title: "Intuitive sense", description: "I'll just know—it's a feeling, not a metric." }
+        ]
+    }
+];
+
+// ============================================
+// EVENT LISTENERS
+// ============================================
+
+// Mode selection
+document.querySelectorAll('.mode-button').forEach(button => {
+    button.addEventListener('click', () => {
+        selectMode(button.dataset.mode);
+    });
+});
+
+// Navigation
 prevBtn.addEventListener('click', goToPreviousQuestion);
 nextBtn.addEventListener('click', goToNextQuestion);
-editBtn.addEventListener('click', showQuestionnaire);
-generateBtn.addEventListener('click', generateSystem);
+
+// Protocol actions
+editProtocolBtn.addEventListener('click', showQuestionnaire);
+generateProtocolBtn.addEventListener('click', generateSystem);
 newSystemBtn.addEventListener('click', resetSystem);
 
-// Display current question
-function displayQuestion(index) {
-  const question = questions[index];
-  
-  let html = `
-    <div class="question-card">
-      <h3><i class="${question.icon}"></i> ${question.question}</h3>
-      <div class="options">
-  `;
-  
-  question.options.forEach(option => {
-    const isSelected = answers[`q${index + 1}`] === option.id;
-    html += `
-      <div class="option ${isSelected ? 'selected' : ''}" data-value="${option.id}">
-        <div class="option-icon">
-          <i class="${option.icon}"></i>
-        </div>
-        <div class="option-content">
-          <h4>${option.title}</h4>
-          <p>${option.description}</p>
-        </div>
-      </div>
-    `;
-  });
-  
-  html += `
-      </div>
-    </div>
-  `;
-  
-  questionContainer.innerHTML = html;
-  
-  // Add click listeners to options
-  document.querySelectorAll('.option').forEach(option => {
-    option.addEventListener('click', function() {
-      const value = this.getAttribute('data-value');
-      answers[`q${index + 1}`] = value;
-      
-      // Update UI
-      document.querySelectorAll('.option').forEach(opt => {
-        opt.classList.remove('selected');
-      });
-      this.classList.add('selected');
-      
-      // Enable next button if this is the last question
-      if (index === questions.length - 1) {
-        nextBtn.disabled = false;
-      }
+// ============================================
+// CORE FUNCTIONS
+// ============================================
+
+function selectMode(mode) {
+    currentMode = mode;
+    userAnswers = {};
+    currentQuestionIndex = 0;
+    
+    // Update UI
+    document.querySelectorAll('.mode-button').forEach(btn => {
+        btn.classList.remove('selected');
     });
-  });
+    event.target.classList.add('selected');
+    
+    // Show first question
+    questionContainer.classList.remove('hidden');
+    navigation.classList.remove('hidden');
+    modeSelector.classList.add('hidden');
+    
+    displayQuestion();
 }
 
-// Update progress bar
-function updateProgressBar() {
-  const progress = ((currentQuestion + 1) / questions.length) * 100;
-  progressBar.style.width = `${progress}%`;
-  
-  // Update step indicators
-  document.querySelectorAll('.step').forEach((step, index) => {
-    if (index <= currentQuestion) {
-      step.classList.add('active');
-    } else {
-      step.classList.remove('active');
+function displayQuestion() {
+    const questions = currentMode === 'utility' ? utilityQuestions : ritualQuestions;
+    const question = questions[currentQuestionIndex];
+    
+    if (!question) {
+        showProtocolPreview();
+        return;
     }
-  });
-}
-
-// Update navigation buttons
-function updateNavigation() {
-  prevBtn.disabled = currentQuestion === 0;
-  
-  if (currentQuestion === questions.length - 1) {
-    nextBtn.innerHTML = 'Preview <i class="fas fa-eye"></i>';
-    nextBtn.disabled = !answers[`q${currentQuestion + 1}`];
-  } else {
-    nextBtn.innerHTML = 'Next <i class="fas fa-arrow-right"></i>';
-    nextBtn.disabled = false;
-  }
-}
-
-// Navigation functions
-function goToPreviousQuestion() {
-  if (currentQuestion > 0) {
-    currentQuestion--;
-    displayQuestion(currentQuestion);
-    updateProgressBar();
+    
+    // Update progress
+    progressIndicator.textContent = `${question.parameter} • ${currentQuestionIndex + 1} of ${questions.length}`;
+    
+    // Build question HTML
+    let html = `
+        <div class="system-card">
+            <div class="card-header">
+                <div>
+                    <div class="parameter-label">Parameter ${currentQuestionIndex + 1}</div>
+                    <div class="parameter-name">${question.parameter}</div>
+                    <div class="parameter-description">${question.description}</div>
+                </div>
+            </div>
+            
+            <div class="options-grid">
+    `;
+    
+    question.options.forEach(option => {
+        const isSelected = userAnswers[question.parameter] === option.id;
+        html += `
+            <div class="option ${isSelected ? 'selected' : ''}" data-value="${option.id}">
+                <div class="option-title">${option.title}</div>
+                <div class="option-desc">${option.description}</div>
+            </div>
+        `;
+    });
+    
+    html += `
+            </div>
+            
+            <div class="systems-concept">
+                <div class="concept-label">Systems Concept</div>
+                <div class="concept-text">${question.systemsConcept}</div>
+            </div>
+        </div>
+    `;
+    
+    questionContainer.innerHTML = html;
+    
+    // Add click listeners to options
+    document.querySelectorAll('.option').forEach(option => {
+        option.addEventListener('click', () => {
+            selectOption(question.parameter, option.dataset.value);
+        });
+    });
+    
+    // Update navigation buttons
     updateNavigation();
-  }
+}
+
+function selectOption(parameter, value) {
+    userAnswers[parameter] = value;
+    
+    // Update UI
+    document.querySelectorAll('.option').forEach(opt => {
+        opt.classList.remove('selected');
+        if (opt.dataset.value === value) {
+            opt.classList.add('selected');
+        }
+    });
+    
+    // Enable next button
+    nextBtn.disabled = false;
+}
+
+function updateNavigation() {
+    const questions = currentMode === 'utility' ? utilityQuestions : ritualQuestions;
+    
+    prevBtn.disabled = currentQuestionIndex === 0;
+    
+    if (currentQuestionIndex === questions.length - 1) {
+        nextBtn.textContent = 'Review Protocol →';
+        nextBtn.disabled = !userAnswers[questions[currentQuestionIndex].parameter];
+    } else {
+        nextBtn.textContent = 'Continue →';
+        nextBtn.disabled = !userAnswers[questions[currentQuestionIndex].parameter];
+    }
+}
+
+function goToPreviousQuestion() {
+    if (currentQuestionIndex > 0) {
+        currentQuestionIndex--;
+        displayQuestion();
+    }
 }
 
 function goToNextQuestion() {
-  if (currentQuestion < questions.length - 1) {
-    // Check if current question is answered
-    if (!answers[`q${currentQuestion + 1}`]) {
-      alert('Please select an option before continuing.');
-      return;
-    }
+    const questions = currentMode === 'utility' ? utilityQuestions : ritualQuestions;
     
-    currentQuestion++;
-    displayQuestion(currentQuestion);
-    updateProgressBar();
-    updateNavigation();
-  } else {
-    // Show preview on last question
-    showPreview();
-  }
+    if (currentQuestionIndex < questions.length - 1) {
+        currentQuestionIndex++;
+        displayQuestion();
+    } else {
+        showProtocolPreview();
+    }
 }
 
-// Show preview
-function showPreview() {
-  // Map answers to readable values
-  const mappedAnswers = {
-    corePurpose: getOptionTitle(answers.q1),
-    maxMinutes: answers.q2,
-    constraint: getOptionTitle(answers.q3),
-    vesselImportance: getOptionTitle(answers.q4),
-    adjustmentTrigger: getOptionTitle(answers.q5)
-  };
-  
-  // Generate system name
-  systemCount++;
-  localStorage.setItem('systemCount', systemCount);
-  const systemName = `${mappedAnswers.corePurpose} System #${systemCount}`;
-  
-  // Update preview content
-  previewContent.innerHTML = `
-    <div class="preview-section">
-      <h4><i class="fas fa-flag"></i> Core Purpose</h4>
-      <p>${mappedAnswers.corePurpose}</p>
-    </div>
-    <div class="preview-section">
-      <h4><i class="fas fa-clock"></i> Time Budget</h4>
-      <p>${mappedAnswers.maxMinutes} minutes maximum</p>
-    </div>
-    <div class="preview-section">
-      <h4><i class="fas fa-compress-arrows-alt"></i> Key Constraint</h4>
-      <p>${mappedAnswers.constraint}</p>
-    </div>
-    <div class="preview-section">
-      <h4><i class="fas fa-mug-hot"></i> Vessel Importance</h4>
-      <p>${mappedAnswers.vesselImportance}</p>
-    </div>
-    <div class="preview-section">
-      <h4><i class="fas fa-cogs"></i> Adjustment Trigger</h4>
-      <p>${mappedAnswers.adjustmentTrigger}</p>
-    </div>
-  `;
-  
-  // Store final answers
-  answers.corePurpose = answers.q1;
-  answers.maxMinutes = answers.q2;
-  answers.constraint = answers.q3;
-  answers.vesselImportance = answers.q4;
-  answers.adjustmentTrigger = answers.q5;
-  answers.systemName = systemName;
-  
-  // Show preview, hide questionnaire
-  questionContainer.style.display = 'none';
-  previewContainer.style.display = 'block';
-  progressBar.parentElement.style.display = 'none';
-  prevBtn.style.display = 'none';
-  nextBtn.style.display = 'none';
+function showProtocolPreview() {
+    // Hide questionnaire
+    questionContainer.classList.add('hidden');
+    navigation.classList.add('hidden');
+    
+    // Generate protocol content
+    generateProtocolContent();
+    
+    // Show protocol preview
+    protocolPreview.classList.remove('hidden');
 }
 
-// Show questionnaire again
-function showQuestionnaire() {
-  previewContainer.style.display = 'none';
-  questionContainer.style.display = 'block';
-  progressBar.parentElement.style.display = 'block';
-  prevBtn.style.display = 'flex';
-  nextBtn.style.display = 'flex';
-}
-
-// Generate system in Notion
-async function generateSystem() {
-  // Show loading, hide preview
-  previewContainer.style.display = 'none';
-  loading.style.display = 'block';
-  
-  try {
-    // Call Netlify function
-    const response = await fetch('/.netlify/functions/generate', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        corePurpose: answers.corePurpose,
-        maxMinutes: answers.maxMinutes,
-        constraint: answers.constraint,
-        vesselImportance: answers.vesselImportance,
-        adjustmentTrigger: answers.adjustmentTrigger,
-        systemName: answers.systemName
-      })
+function generateProtocolContent() {
+    const questions = currentMode === 'utility' ? utilityQuestions : ritualQuestions;
+    
+    // Set protocol title
+    protocolTitle.textContent = `${currentMode === 'utility' ? 'UTILITY' : 'RITUAL'} PROTOCOL`;
+    protocolMeta.textContent = `v1.0 • ${new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
+    
+    // Generate objective
+    const purpose = currentMode === 'utility' 
+        ? userAnswers['Primary Function'] 
+        : userAnswers['Core Purpose'];
+    
+    protocolObjective.textContent = currentMode === 'utility'
+        ? `Optimize for ${purpose ? purpose.replace('-', ' ') : 'primary function'} within specified constraints.`
+        : `Cultivate ${purpose ? purpose.toLowerCase() : 'intentional'} state through repeatable ritual.`;
+    
+    // Generate configuration list
+    protocolConfig.innerHTML = '';
+    questions.forEach(q => {
+        const answer = userAnswers[q.parameter];
+        const option = q.options.find(opt => opt.id === answer);
+        if (option) {
+            const li = document.createElement('li');
+            li.className = 'protocol-item';
+            li.textContent = `${q.parameter}: ${option.title}`;
+            protocolConfig.appendChild(li);
+        }
     });
     
-    const result = await response.json();
+    // Generate sequence based on answers
+    protocolSequence.innerHTML = '';
+    const sequenceSteps = generateSequenceSteps();
+    sequenceSteps.forEach(step => {
+        const li = document.createElement('li');
+        li.className = 'protocol-item';
+        li.textContent = step;
+        protocolSequence.appendChild(li);
+    });
     
-    if (result.success) {
-      // Show success
-      loading.style.display = 'none';
-      notionLink.innerHTML = `
-        <a href="${result.pageUrl}" target="_blank" rel="noopener noreferrer">
-          <i class="fab fa-notion"></i> Open your Coffee System in Notion
-        </a>
-      `;
-      resultContainer.style.display = 'block';
+    // Generate failure conditions
+    protocolFailure.innerHTML = '';
+    const failures = generateFailureConditions();
+    failures.forEach(failure => {
+        const li = document.createElement('li');
+        li.className = 'protocol-item failure-condition';
+        li.textContent = failure;
+        protocolFailure.appendChild(li);
+    });
+    
+    // Generate repeat rule
+    const repeatRule = currentMode === 'utility'
+        ? 'Execute daily before first work session. Do not modify more than one variable at a time.'
+        : 'Execute upon waking, before digital exposure. Deviation reduces reliability.';
+    protocolRepeat.textContent = repeatRule;
+}
+
+function generateSequenceSteps() {
+    const steps = [];
+    
+    if (currentMode === 'utility') {
+        steps.push('Prepare equipment according to time budget');
+        steps.push('Measure inputs based on cost parameter');
+        steps.push('Execute brew method optimized for environment');
+        steps.push('Consume within optimal window for function');
     } else {
-      throw new Error(result.error || 'Failed to create system');
+        steps.push('Set up space according to vessel importance');
+        steps.push('Engage in sensory preparation (smell, sound, touch)');
+        steps.push('Execute ritual sequence with intentional pacing');
+        steps.push('Complete with designated reflection period');
     }
     
-  } catch (error) {
-    loading.style.display = 'none';
-    previewContainer.style.display = 'block';
-    alert(`Error: ${error.message}\n\nPlease try again.`);
-    console.error('Generation error:', error);
-  }
+    return steps;
 }
 
-// Reset for new system
-function resetSystem() {
-  currentQuestion = 0;
-  answers = {};
-  resultContainer.style.display = 'none';
-  showQuestionnaire();
-  displayQuestion(currentQuestion);
-  updateProgressBar();
-  updateNavigation();
-}
-
-// Helper function to get option title by ID
-function getOptionTitle(optionId) {
-  for (const question of questions) {
-    for (const option of question.options) {
-      if (option.id === optionId) {
-        return option.title;
-      }
+function generateFailureConditions() {
+    const conditions = [];
+    
+    if (currentMode === 'utility') {
+        conditions.push('Rushing preparation beyond time budget');
+        conditions.push('Compromising on key constraint for convenience');
+        conditions.push('Operating outside designated environment');
+    } else {
+        conditions.push('Skipping steps or rushing sequence');
+        conditions.push('Ignoring maintenance protocol triggers');
+        conditions.push('Allowing external interruptions');
     }
-  }
-  return optionId;
+    
+    return conditions;
 }
+
+function showQuestionnaire() {
+    protocolPreview.classList.add('hidden');
+    questionContainer.classList.remove('hidden');
+    navigation.classList.remove('hidden');
+}
+
+async function generateSystem() {
+    // Show loading
+    protocolPreview.classList.add('hidden');
+    loadingState.classList.remove('hidden');
+    
+    try {
+        // Prepare data for Notion
+        const systemName = `${currentMode === 'utility' ? 'Utility' : 'Ritual'} System ${parseInt(systemId) + 1}`;
+        
+        const response = await fetch('/.netlify/functions/generate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                mode: currentMode,
+                answers: userAnswers,
+                systemName: systemName,
+                timestamp: new Date().toISOString()
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            // Update system count
+            systemId = parseInt(systemId) + 1;
+            localStorage.setItem('systemCount', systemId);
+            
+            // Show success
+            loadingState.classList.add('hidden');
+            notionUrl.textContent = result.pageUrl;
+            openNotionBtn.href = result.pageUrl;
+            successState.classList.remove('hidden');
+        } else {
+            throw new Error(result.error || 'Failed to create system');
+        }
+        
+    } catch (error) {
+        loadingState.classList.add('hidden');
+        protocolPreview.classList.remove('hidden');
+        alert(`Error: ${error.message}\n\nPlease try again.`);
+        console.error('Generation error:', error);
+    }
+}
+
+function resetSystem() {
+    currentMode = null;
+    currentQuestionIndex = 0;
+    userAnswers = {};
+    
+    // Reset UI
+    successState.classList.add('hidden');
+    modeSelector.classList.remove('hidden');
+    document.querySelectorAll('.mode-button').forEach(btn => {
+        btn.classList.remove('selected');
+    });
+}
+
+// ============================================
+// INITIALIZATION
+// ============================================
+
+// Check if there's an existing system count
+if (!localStorage.getItem('systemCount')) {
+    localStorage.setItem('systemCount', '0');
+}
+
+// Log initialization
+console.log('Coffee System Generator initialized • SSENSE × GitLab aesthetic • Two-path logic');
