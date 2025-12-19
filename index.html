@@ -1,55 +1,103 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Coffee System</title>
-
-    <link rel="stylesheet" href="style.css" />
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Coffee System</title>
+	<link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
-    <header class="header">
-        <h1 class="title">Coffee System</h1>
-        <p class="subtitle">A procedural ritual for clarity and execution</p>
-    </header>
+	<header class="header">
+		<h1 class="title">Coffee System</h1>
+		<p class="subtitle">A procedural ritual for clarity and execution</p>
+	</header>
 
-    <main class="main">
-        <section class="mode-select">
-            <button class="mode-btn" data-mode="utility">Utility</button>
-            <button class="mode-btn" data-mode="ritual">Ritual</button>
-        </section>
+	<main class="main">
 
-        <section id="question-container" class="question-container hidden">
-            <p id="question-text"></p>
-            <div class="question-actions">
-                <button id="yes-btn">Yes</button>
-                <button id="no-btn">No</button>
-            </div>
-        </section>
+		<!-- MODE SELECTOR -->
+		<section id="modeSelector" class="mode-select">
+			<button class="mode-button mode-btn" data-mode="utility" type="button">Utility</button>
+			<button class="mode-button mode-btn" data-mode="ritual" type="button">Ritual</button>
+		</section>
 
-        <section id="protocol-container" class="protocol-container hidden">
-            <h2>Your Coffee System Protocol</h2>
-            <div id="protocol-output"></div>
-            <button id="generate-notion-btn">
-                Generate Notion Page
-            </button>
-        </section>
+		<!-- QUESTIONNAIRE -->
+		<section id="questionContainer" class="question-container hidden"></section>
 
-        <section id="success-container" class="success-container hidden">
-            <h2>System Created</h2>
-            <p>Your protocol has been created in Notion.</p>
-            <a id="notion-link" href="#" target="_blank">
-                Open Notion Page
-            </a>
-        </section>
-    </main>
+		<!-- NAVIGATION -->
+		<section id="navigation" class="navigation hidden">
+			<button id="prevBtn" type="button">← Back</button>
+			<div id="progressIndicator" class="progress-indicator">—</div>
+			<button id="nextBtn" type="button" disabled>Continue →</button>
+		</section>
 
-    <footer class="footer">
-        <p>DreamCo</p>
-    </footer>
+		<!-- PROTOCOL PREVIEW -->
+		<section id="protocolPreview" class="protocol-container hidden">
+			<div class="protocol-header">
+				<h2 id="protocolTitle">PROTOCOL</h2>
+				<div id="protocolMeta" class="protocol-meta">v1.0 • —</div>
+			</div>
 
-    <!-- JS MUST LOAD AFTER THE DOM -->
-    <script src="script.js"></script>
+			<div class="protocol-section">
+				<h3>Objective</h3>
+				<p id="protocolObjective"></p>
+			</div>
+
+			<div class="protocol-section">
+				<h3>Configuration</h3>
+				<ul id="protocolConfig" class="protocol-list"></ul>
+			</div>
+
+			<div class="protocol-section">
+				<h3>Sequence</h3>
+				<ul id="protocolSequence" class="protocol-list"></ul>
+			</div>
+
+			<div class="protocol-section">
+				<h3>Failure Conditions</h3>
+				<ul id="protocolFailure" class="protocol-list"></ul>
+			</div>
+
+			<div class="protocol-section">
+				<h3>Repeat Rule</h3>
+				<p id="protocolRepeat"></p>
+			</div>
+
+			<div class="protocol-actions">
+				<button id="editProtocolBtn" type="button">← Edit Answers</button>
+				<button id="generateProtocolBtn" type="button">Generate Notion Page</button>
+			</div>
+		</section>
+
+		<!-- LOADING -->
+		<section id="loadingState" class="loading-container hidden">
+			<h2>Creating Notion page…</h2>
+			<p>Please wait.</p>
+		</section>
+
+		<!-- SUCCESS -->
+		<section id="successState" class="success-container hidden">
+			<h2>System Created</h2>
+			<p>Your protocol has been created in Notion.</p>
+
+			<p class="notion-url">
+				<span>Notion URL:</span>
+				<span id="notionUrl">—</span>
+			</p>
+
+			<a id="openNotionBtn" href="#" target="_blank" rel="noopener noreferrer">Open Notion Page</a>
+
+			<div class="success-actions">
+				<button id="newSystemBtn" type="button">Create Another System</button>
+			</div>
+		</section>
+
+	</main>
+
+	<footer class="footer">
+		<p>DreamCo</p>
+	</footer>
+
+	<script src="script.js"></script>
 </body>
 </html>
