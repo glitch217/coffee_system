@@ -1,156 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Coffee System Generator</title>
-    
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-    
-    <!-- Styles -->
-    <link rel="stylesheet" href="style.css">
-    
-    <!-- Force accent color inline -->
-<style>
-  /* Test element - should show #7851a9 */
-  .test-accent {
-    color: #7851a9;
-    padding: 1rem;
-    border: 2px solid #7851a9;
-    margin: 1rem 0;
-  }
-</style>
-<div class="test-accent">If this shows purple, CSS works. If not, CSS broken.</div>
-<script src="script.js"></script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Coffee System</title>
+
+    <link rel="stylesheet" href="style.css" />
 </head>
+
 <body>
-    <div class="container">
-        <!-- Header -->
-        <header class="protocol-header">
-            <h1 class="protocol-title">COFFEE SYSTEM GENERATOR</h1>
-            <p class="protocol-meta">A systems literacy artifact • v1.0</p>
-        </header>
+    <header class="header">
+        <h1 class="title">Coffee System</h1>
+        <p class="subtitle">A procedural ritual for clarity and execution</p>
+    </header>
 
-        <!-- Mode Selection -->
-        <section class="mode-selector" id="modeSelector">
-            <div class="mode-label">Select Mode</div>
-            <div class="mode-buttons">
-                <button class="mode-button" data-mode="utility">
-                    UTILITY
-                    <div class="mode-description">
-                        Coffee as a problem to solve. Variables: cost, time, consistency.
-                    </div>
-                </button>
-                <button class="mode-button" data-mode="ritual">
-                    RITUAL
-                    <div class="mode-description">
-                        Coffee as a repeatable experience. Process as ritual, not improvisation.
-                    </div>
-                </button>
+    <main class="main">
+        <section class="mode-select">
+            <button class="mode-btn" data-mode="utility">Utility</button>
+            <button class="mode-btn" data-mode="ritual">Ritual</button>
+        </section>
+
+        <section id="question-container" class="question-container hidden">
+            <p id="question-text"></p>
+            <div class="question-actions">
+                <button id="yes-btn">Yes</button>
+                <button id="no-btn">No</button>
             </div>
         </section>
 
-        <!-- Question Container -->
-        <section id="questionContainer" class="hidden">
-            <!-- Questions injected by JavaScript -->
-        </section>
-
-        <!-- Navigation -->
-        <section id="navigation" class="navigation hidden">
-            <button class="btn btn-secondary" id="prevBtn" disabled>
-                ← Back
-            </button>
-            <div class="card-progress" id="progressIndicator">Parameter 1 of 5</div>
-            <button class="btn btn-primary" id="nextBtn">
-                Continue →
+        <section id="protocol-container" class="protocol-container hidden">
+            <h2>Your Coffee System Protocol</h2>
+            <div id="protocol-output"></div>
+            <button id="generate-notion-btn">
+                Generate Notion Page
             </button>
         </section>
 
-        <!-- Protocol Output (Preview) -->
-        <section id="protocolPreview" class="protocol-container hidden">
-            <div class="protocol-header">
-                <h2 class="protocol-title" id="protocolTitle">SYSTEM PROTOCOL</h2>
-                <p class="protocol-meta" id="protocolMeta">Generated from configuration</p>
-            </div>
-            
-            <div class="protocol-body">
-                <div class="protocol-section">
-                    <h3 class="section-title">Objective</h3>
-                    <div id="protocolObjective" class="mono">
-                        <!-- Filled by JS -->
-                    </div>
-                </div>
-                
-                <div class="protocol-section">
-                    <h3 class="section-title">Configuration</h3>
-                    <ul class="protocol-list" id="protocolConfig">
-                        <!-- Filled by JS -->
-                    </ul>
-                </div>
-                
-                <div class="protocol-section">
-                    <h3 class="section-title">Sequence</h3>
-                    <ul class="protocol-list" id="protocolSequence">
-                        <!-- Filled by JS -->
-                    </ul>
-                </div>
-                
-                <div class="protocol-section">
-                    <h3 class="section-title">Failure Conditions</h3>
-                    <ul class="protocol-list" id="protocolFailure">
-                        <!-- Filled by JS -->
-                    </ul>
-                </div>
-                
-                <div class="protocol-section">
-                    <h3 class="section-title">Repeat Rule</h3>
-                    <div id="protocolRepeat" class="mono">
-                        <!-- Filled by JS -->
-                    </div>
-                </div>
-            </div>
-            
-            <div class="navigation mt-4">
-                <button class="btn btn-secondary" id="editProtocolBtn">
-                    ← Edit Configuration
-                </button>
-                <button class="btn btn-primary" id="generateProtocolBtn">
-                    Generate System Protocol →
-                </button>
-            </div>
+        <section id="success-container" class="success-container hidden">
+            <h2>System Created</h2>
+            <p>Your protocol has been created in Notion.</p>
+            <a id="notion-link" href="#" target="_blank">
+                Open Notion Page
+            </a>
         </section>
+    </main>
 
-        <!-- Loading State -->
-        <section id="loadingState" class="loading-state hidden">
-            <div class="code-block text-center">
-                <div class="mono">Generating system protocol...</div>
-                <div class="small mt-2">Creating Notion page with complete execution manual</div>
-            </div>
-        </section>
+    <footer class="footer">
+        <p>DreamCo</p>
+    </footer>
 
-        <!-- Success State -->
-        <section id="successState" class="success-state hidden">
-            <div class="success-icon">✓</div>
-            <h2>System Protocol Generated</h2>
-            <p class="mb-3">A complete execution manual has been created in Notion.</p>
-            <div class="code-block">
-                <div class="mono" id="notionUrl">Notion page URL will appear here</div>
-            </div>
-            <div class="navigation mt-4">
-                <button class="btn btn-secondary" id="newSystemBtn">
-                    ← Create New System
-                </button>
-                <a href="#" class="btn btn-primary" id="openNotionBtn" target="_blank">
-                    Open Protocol →
-                </a>
-            </div>
-        </section>
-    </div>
-
-    <!-- JavaScript -->
+    <!-- JS MUST LOAD AFTER THE DOM -->
     <script src="script.js"></script>
 </body>
 </html>
