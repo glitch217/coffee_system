@@ -10,42 +10,60 @@ exports.handler = async (event) => {
     if (event.httpMethod !== 'POST') {
       return {
         statusCode: 405,
-        body: JSON.stringify({ error: 'Method not allowed' })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ success: false, error: 'Method not allowed' })
       };
     }
 
-    // Parse body safely
+    // Parse JSON body
     let data;
     try {
-      data = JSON.parse(event.body);
+      data = JSON.parse(event.body || '{}');
     } catch (err) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: 'Invalid JSON body' })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ success: false, error: 'Invalid JSON body' })
       };
     }
 
     const { mode, answers, systemName, timestamp } = data;
 
-    // Minimal, correct validation
+    // Validate request payload
     if (!mode || !answers || typeof answers !== 'object') {
       return {
         statusCode: 400,
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          success: false,
           error: 'Missing required fields',
-          received: { mode, answers, systemName, timestamp }
+          received: { mode, answersType: typeof answers, systemName, timestamp }
         })
       };
     }
 
-    if (!process.env.NOTION_DATABASE_ID) {
+    // Validate environment variables
+    const hasToken = Boolean(process.env.NOTION_TOKEN);
+    const dbId = process.env.NOTION_DATABASE_ID;
+
+    if (!hasToken || !dbId) {
       return {
         statusCode: 500,
-        body: JSON.stringify({ error: 'Notion database ID not configured' })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          success: false,
+          error: 'Missing Notion environment variables',
+          missing: {
+            NOTION_TOKEN: hasToken ? false : true,
+            NOTION_DATABASE_ID: dbId ? false : true
+          }
+        })
       };
     }
 
-    // Build Notion properties
+    // ---- Notion database property names ----
+    // IMPORTANT: these must match your Notion DB schema exactly.
+    // If your DB uses different property names, Notion will throw a validation error.
     const properties = {
       Name: {
         title: [
@@ -68,7 +86,6 @@ exports.handler = async (event) => {
       }
     };
 
-    // Add answers as rich text blocks
     const children = Object.entries(answers).map(([key, value]) => ({
       object: 'block',
       type: 'paragraph',
@@ -77,24 +94,23 @@ exports.handler = async (event) => {
           {
             type: 'text',
             text: {
-              content: `${key}: ${value}`
+              content: `${key}: ${String(value)}`
             }
           }
         ]
       }
     }));
 
-    // Create page in Notion
+    // Create page
     const response = await notion.pages.create({
-      parent: {
-        database_id: process.env.NOTION_DATABASE_ID
-      },
+      parent: { database_id: dbId },
       properties,
       children
     });
 
     return {
       statusCode: 200,
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         success: true,
         pageUrl: response.url
@@ -102,13 +118,37 @@ exports.handler = async (event) => {
     };
 
   } catch (error) {
-    console.error('Generate function error:', error);
+    // Surface useful Notion error information (without dumping secrets)
+    const status = error?.status || 500;
+    const code = error?.code || null;
+
+    // Notion SDK typically provides `body` with details
+    const notionMessage =
+      error?.body?.message ||
+      error?.message ||
+      'Unknown error';
+
+    const notionDetails =
+      error?.body ||
+      null;
+
+    console.error('Generate function error:', {
+      status,
+      code,
+      message: notionMessage,
+      details: notionDetails
+    });
 
     return {
       statusCode: 500,
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
+        success: false,
         error: 'Internal server error',
-        details: error.message
+        status,
+        code,
+        message: notionMessage,
+        details: notionDetails
       })
     };
   }
