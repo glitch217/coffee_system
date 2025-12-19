@@ -1,6 +1,6 @@
 // ============================================
 // COFFEE SYSTEM GENERATOR - TWO-PATH LOGIC
-// Design: SSENSE × GitLab, Systems literacy focus
+// Crash-proof + robust backend error display
 // ============================================
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ============================================
     // DOM ELEMENTS (SAFE LOOKUPS)
-// ============================================
+    // ============================================
     const modeSelector = document.getElementById('modeSelector');
     const questionContainer = document.getElementById('questionContainer');
     const navigation = document.getElementById('navigation');
@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const openNotionBtn = document.getElementById('openNotionBtn');
     const notionUrl = document.getElementById('notionUrl');
 
-    // Protocol display elements (may not exist on minimalist versions)
+    // Protocol display elements
     const protocolTitle = document.getElementById('protocolTitle');
     const protocolMeta = document.getElementById('protocolMeta');
     const protocolObjective = document.getElementById('protocolObjective');
@@ -41,7 +41,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const protocolFailure = document.getElementById('protocolFailure');
     const protocolRepeat = document.getElementById('protocolRepeat');
 
-    // Helper: avoid hard crashes when an element is missing
     const exists = (el) => el !== null && el !== undefined;
 
     // ============================================
@@ -169,29 +168,27 @@ document.addEventListener('DOMContentLoaded', () => {
     ];
 
     // ============================================
-    // EVENT LISTENERS (SAFE)
+    // EVENT LISTENERS
     // ============================================
 
-    // Mode selection (works as long as .mode-button exists)
     const modeButtons = document.querySelectorAll('.mode-button');
     if (modeButtons.length > 0) {
         modeButtons.forEach((button) => {
-            button.addEventListener('click', () => {
+            button.addEventListener('click', (e) => {
+                e.preventDefault();
                 selectMode(button.dataset.mode, button);
             });
         });
     } else {
-        console.warn('No .mode-button elements found. If your UI is simplified, update index.html or class names to match.');
+        console.warn('No .mode-button elements found.');
     }
 
-    // Navigation (only if buttons exist)
-    if (exists(prevBtn)) prevBtn.addEventListener('click', goToPreviousQuestion);
-    if (exists(nextBtn)) nextBtn.addEventListener('click', goToNextQuestion);
+    if (exists(prevBtn)) prevBtn.addEventListener('click', (e) => { e.preventDefault(); goToPreviousQuestion(); });
+    if (exists(nextBtn)) nextBtn.addEventListener('click', (e) => { e.preventDefault(); goToNextQuestion(); });
 
-    // Protocol actions
-    if (exists(editProtocolBtn)) editProtocolBtn.addEventListener('click', showQuestionnaire);
-    if (exists(generateProtocolBtn)) generateProtocolBtn.addEventListener('click', generateSystem);
-    if (exists(newSystemBtn)) newSystemBtn.addEventListener('click', resetSystem);
+    if (exists(editProtocolBtn)) editProtocolBtn.addEventListener('click', (e) => { e.preventDefault(); showQuestionnaire(); });
+    if (exists(generateProtocolBtn)) generateProtocolBtn.addEventListener('click', (e) => { e.preventDefault(); generateSystem(); });
+    if (exists(newSystemBtn)) newSystemBtn.addEventListener('click', (e) => { e.preventDefault(); resetSystem(); });
 
     // ============================================
     // CORE FUNCTIONS
@@ -202,11 +199,9 @@ document.addEventListener('DOMContentLoaded', () => {
         userAnswers = {};
         currentQuestionIndex = 0;
 
-        // Update UI for mode buttons
         document.querySelectorAll('.mode-button').forEach((btn) => btn.classList.remove('selected'));
         if (clickedButton) clickedButton.classList.add('selected');
 
-        // Show first question if the questionnaire UI exists
         if (exists(questionContainer)) questionContainer.classList.remove('hidden');
         if (exists(navigation)) navigation.classList.remove('hidden');
         if (exists(modeSelector)) modeSelector.classList.add('hidden');
@@ -223,26 +218,21 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // If the question container isn't in this build, don't crash—just log.
         if (!exists(questionContainer)) {
-            console.warn('Question container not found (#questionContainer). Your UI may be missing the questionnaire section.');
+            console.warn('Question container not found (#questionContainer).');
             return;
         }
 
-        // Update progress
         if (exists(progressIndicator)) {
             progressIndicator.textContent = `${question.parameter} • ${currentQuestionIndex + 1} of ${questions.length}`;
         }
 
-        // Build question HTML
         let html = `
             <div class="system-card">
                 <div class="card-header">
-                    <div>
-                        <div class="parameter-label">Parameter ${currentQuestionIndex + 1}</div>
-                        <div class="parameter-name">${question.parameter}</div>
-                        <div class="parameter-description">${question.description}</div>
-                    </div>
+                    <div class="parameter-label">Parameter ${currentQuestionIndex + 1}</div>
+                    <div class="parameter-name">${question.parameter}</div>
+                    <div class="parameter-description">${question.description}</div>
                 </div>
 
                 <div class="options-grid">
@@ -253,7 +243,7 @@ document.addEventListener('DOMContentLoaded', () => {
             html += `
                 <div class="option ${isSelected ? 'selected' : ''}" data-value="${option.id}">
                     <div class="option-title">${option.title}</div>
-                    <div class="option-desc">${option.description}</div>
+                    <div class="option-body">${option.description}</div>
                 </div>
             `;
         });
@@ -261,7 +251,7 @@ document.addEventListener('DOMContentLoaded', () => {
         html += `
                 </div>
 
-                <div class="systems-concept">
+                <div class="concept-block">
                     <div class="concept-label">Systems Concept</div>
                     <div class="concept-text">${question.systemsConcept}</div>
                 </div>
@@ -270,9 +260,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         questionContainer.innerHTML = html;
 
-        // Add click listeners to options
         document.querySelectorAll('.option').forEach((optionEl) => {
-            optionEl.addEventListener('click', () => {
+            optionEl.addEventListener('click', (e) => {
+                e.preventDefault();
                 selectOption(question.parameter, optionEl.dataset.value);
             });
         });
@@ -283,13 +273,11 @@ document.addEventListener('DOMContentLoaded', () => {
     function selectOption(parameter, value) {
         userAnswers[parameter] = value;
 
-        // Update UI
         document.querySelectorAll('.option').forEach((opt) => {
             opt.classList.remove('selected');
             if (opt.dataset.value === value) opt.classList.add('selected');
         });
 
-        // Enable next button
         if (exists(nextBtn)) nextBtn.disabled = false;
     }
 
@@ -331,27 +319,21 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function showProtocolPreview() {
-        // If preview UI isn't present, don't crash—just log.
         if (!exists(protocolPreview)) {
-            console.warn('Protocol preview container not found (#protocolPreview). UI may be missing preview section.');
+            console.warn('Protocol preview container not found (#protocolPreview).');
             return;
         }
 
-        // Hide questionnaire
         if (exists(questionContainer)) questionContainer.classList.add('hidden');
         if (exists(navigation)) navigation.classList.add('hidden');
 
-        // Generate protocol content
         generateProtocolContent();
-
-        // Show protocol preview
         protocolPreview.classList.remove('hidden');
     }
 
     function generateProtocolContent() {
         const questions = currentMode === 'utility' ? utilityQuestions : ritualQuestions;
 
-        // Title/meta
         if (exists(protocolTitle)) {
             protocolTitle.textContent = `${currentMode === 'utility' ? 'UTILITY' : 'RITUAL'} PROTOCOL`;
         }
@@ -359,7 +341,6 @@ document.addEventListener('DOMContentLoaded', () => {
             protocolMeta.textContent = `v1.0 • ${new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
         }
 
-        // Objective
         const purpose = currentMode === 'utility'
             ? userAnswers['Primary Function']
             : userAnswers['Core Purpose'];
@@ -371,7 +352,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     : `Cultivate ${purpose ? purpose.toLowerCase() : 'intentional'} state through repeatable ritual.`;
         }
 
-        // Config list
         if (exists(protocolConfig)) {
             protocolConfig.innerHTML = '';
             questions.forEach((q) => {
@@ -379,38 +359,30 @@ document.addEventListener('DOMContentLoaded', () => {
                 const option = q.options.find((opt) => opt.id === answer);
                 if (option) {
                     const li = document.createElement('li');
-                    li.className = 'protocol-item';
                     li.textContent = `${q.parameter}: ${option.title}`;
                     protocolConfig.appendChild(li);
                 }
             });
         }
 
-        // Sequence list
         if (exists(protocolSequence)) {
             protocolSequence.innerHTML = '';
-            const sequenceSteps = generateSequenceSteps();
-            sequenceSteps.forEach((step) => {
+            generateSequenceSteps().forEach((step) => {
                 const li = document.createElement('li');
-                li.className = 'protocol-item';
                 li.textContent = step;
                 protocolSequence.appendChild(li);
             });
         }
 
-        // Failure list
         if (exists(protocolFailure)) {
             protocolFailure.innerHTML = '';
-            const failures = generateFailureConditions();
-            failures.forEach((failure) => {
+            generateFailureConditions().forEach((failure) => {
                 const li = document.createElement('li');
-                li.className = 'protocol-item failure-condition';
                 li.textContent = failure;
                 protocolFailure.appendChild(li);
             });
         }
 
-        // Repeat rule
         if (exists(protocolRepeat)) {
             protocolRepeat.textContent =
                 currentMode === 'utility'
@@ -420,37 +392,37 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function generateSequenceSteps() {
-        const steps = [];
-
         if (currentMode === 'utility') {
-            steps.push('Prepare equipment according to time budget');
-            steps.push('Measure inputs based on cost parameter');
-            steps.push('Execute brew method optimized for environment');
-            steps.push('Consume within optimal window for function');
-        } else {
-            steps.push('Set up space according to vessel importance');
-            steps.push('Engage in sensory preparation (smell, sound, touch)');
-            steps.push('Execute ritual sequence with intentional pacing');
-            steps.push('Complete with designated reflection period');
+            return [
+                'Prepare equipment according to time budget',
+                'Measure inputs based on cost parameter',
+                'Execute brew method optimized for environment',
+                'Consume within optimal window for function'
+            ];
         }
 
-        return steps;
+        return [
+            'Set up space according to vessel importance',
+            'Engage in sensory preparation (smell, sound, touch)',
+            'Execute ritual sequence with intentional pacing',
+            'Complete with designated reflection period'
+        ];
     }
 
     function generateFailureConditions() {
-        const conditions = [];
-
         if (currentMode === 'utility') {
-            conditions.push('Rushing preparation beyond time budget');
-            conditions.push('Compromising on key constraint for convenience');
-            conditions.push('Operating outside designated environment');
-        } else {
-            conditions.push('Skipping steps or rushing sequence');
-            conditions.push('Ignoring maintenance protocol triggers');
-            conditions.push('Allowing external interruptions');
+            return [
+                'Rushing preparation beyond time budget',
+                'Compromising on key constraint for convenience',
+                'Operating outside designated environment'
+            ];
         }
 
-        return conditions;
+        return [
+            'Skipping steps or rushing sequence',
+            'Ignoring maintenance protocol triggers',
+            'Allowing external interruptions'
+        ];
     }
 
     function showQuestionnaire() {
@@ -459,51 +431,63 @@ document.addEventListener('DOMContentLoaded', () => {
         if (exists(navigation)) navigation.classList.remove('hidden');
     }
 
+    // ============================================
+    // IMPORTANT CHANGE: parse backend error JSON
+    // ============================================
     async function generateSystem() {
         if (!exists(protocolPreview) || !exists(loadingState)) {
             console.warn('Cannot generate system: preview/loading UI not found.');
             return;
         }
 
-        // Show loading
         protocolPreview.classList.add('hidden');
         loadingState.classList.remove('hidden');
 
         try {
             const systemName = `${currentMode === 'utility' ? 'Utility' : 'Ritual'} System ${parseInt(systemId) + 1}`;
 
-            const response = await fetch('/.netlify/functions/generate', {
+            const res = await fetch('/.netlify/functions/generate', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     mode: currentMode,
                     answers: userAnswers,
-                    systemName: systemName,
+                    systemName,
                     timestamp: new Date().toISOString()
                 })
             });
 
-            const result = await response.json();
-
-            if (result.success) {
-                // Update system count
-                systemId = parseInt(systemId) + 1;
-                localStorage.setItem('systemCount', systemId);
-
-                // Show success
-                loadingState.classList.add('hidden');
-
-                if (exists(notionUrl)) notionUrl.textContent = result.pageUrl;
-                if (exists(openNotionBtn)) openNotionBtn.href = result.pageUrl;
-
-                if (exists(successState)) successState.classList.remove('hidden');
-            } else {
-                throw new Error(result.error || 'Failed to create system');
+            // Always attempt to parse JSON (even on 400/500)
+            let result = null;
+            const text = await res.text();
+            try {
+                result = JSON.parse(text);
+            } catch {
+                result = { success: false, error: 'Non-JSON response', raw: text };
             }
+
+            if (!res.ok || !result?.success) {
+                const msg = result?.message || result?.error || `HTTP ${res.status}`;
+                const details = result?.details ? JSON.stringify(result.details, null, 2) : '';
+                throw new Error(`${msg}${details ? `\n\nDetails:\n${details}` : ''}`);
+            }
+
+            // Success path
+            systemId = parseInt(systemId) + 1;
+            localStorage.setItem('systemCount', systemId);
+
+            loadingState.classList.add('hidden');
+
+            if (exists(notionUrl)) notionUrl.textContent = result.pageUrl;
+            if (exists(openNotionBtn)) openNotionBtn.href = result.pageUrl;
+
+            if (exists(successState)) successState.classList.remove('hidden');
+
         } catch (error) {
             if (exists(loadingState)) loadingState.classList.add('hidden');
             if (exists(protocolPreview)) protocolPreview.classList.remove('hidden');
-            alert(`Error: ${error.message}\n\nPlease try again.`);
+
+            alert(`Error:\n${error.message}\n\nPlease try again.`);
             console.error('Generation error:', error);
         }
     }
@@ -513,7 +497,6 @@ document.addEventListener('DOMContentLoaded', () => {
         currentQuestionIndex = 0;
         userAnswers = {};
 
-        // Reset UI (only if elements exist)
         if (exists(successState)) successState.classList.add('hidden');
         if (exists(protocolPreview)) protocolPreview.classList.add('hidden');
         if (exists(questionContainer)) questionContainer.classList.add('hidden');
@@ -527,7 +510,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // ============================================
     // INITIALIZATION
     // ============================================
-
     if (!localStorage.getItem('systemCount')) {
         localStorage.setItem('systemCount', '0');
     }
